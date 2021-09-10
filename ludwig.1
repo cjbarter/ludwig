@@ -1,0 +1,157 @@
+.\"   This source file by:
+.\"
+.\"       Bevin R. Brett (1987); and
+.\"       Kelvin B. Nicolle (1989).
+.\"
+.\"  Copyright  1987, 1989 University of Adelaide
+.\"
+.\"  Permission is hereby granted, free of charge, to any person
+.\"  obtaining a copy of this software and associated documentation
+.\"  files (the "Software"), to deal in the Software without
+.\"  restriction, including without limitation the rights to use, copy,
+.\"  modify, merge, publish, distribute, sublicense, and/or sell copies
+.\"  of the Software, and to permit persons to whom the Software is
+.\"  furnished to do so, subject to the following conditions:
+.\"
+.\"  The above copyright notice and this permission notice shall be
+.\"  included in all copies or substantial portions of the Software.
+.\"
+.\"  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+.\"  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+.\"  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+.\"  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+.\"  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+.\"  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+.\"  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+.\"  SOFTWARE.
+.TH Ludwig l "7 June 1989"
+.SH NAME
+ludwig \- an interactive, screen-oriented text editor.
+.SH SYNTAX
+.B ludwig
+[
+.B \-o
+] [
+.B \-O
+] [
+.B \-c
+] [
+.B \-r
+] [
+.B \-i
+file
+] [
+.B \-I
+] [
+.B \-s
+value
+] [
+.B \-m
+file
+] [
+.B \-M
+] [
+.B \-t
+] [
+.B \-T
+] [
+.B \-b
+value
+] [
+.B \-B
+value
+] [
+.B \-u
+] [
+file
+[
+file
+] ]
+.SH DESCRIPTION
+.I Ludwig
+is an interactive, screen-oriented text editor.
+It may be used to create and modify computer programs,
+documents or any other text which consists only of
+printable characters.  During an editing session, the text
+is displayed on the terminal screen and the user may type
+in further text and enter commands to modify the text. The
+changes made to the text will in most cases be immediately
+visible on the screen. Ludwig may also be used on hardcopy
+terminals and in shell scripts, but it is primarily an
+interactive screen editor.
+.SH OPTIONS
+.TP
+.B \-o
+Use the old command language.  This is the default action.
+.TP
+.B \-O
+Use the new command language introduced with Ludwig V4.1.  Further
+information may be obtained from section 7 of the interactive help
+facility of the new version of Ludwig.
+.TP
+.B \-c
+Create an output file, checking that it doesn't exist already.
+.TP
+.B \-r
+Open the file without an output file, i.e. in read\-only mode.
+.TP
+.B \-i file
+Specify a file to be executed after the default frame LUDWIG has been
+loaded but before editing may commence, the default file is ~/.ludwigrc.
+.TP
+.B \-I
+Do not perform any initialization.
+.TP
+.B \-s value
+The number of characters of text allowed in the default frame. The default
+value, if this option is not used, is 500000.
+.TP
+.B \-m file
+Use the first line in the named file as the name of the file to edit.
+Ludwig will update this file with the path of the current output file,
+by default this file is ~/.lud_memory.
+.TP
+.B \-M
+Don't use, or set, the ludwig filename memory.
+.TP
+.B \-t
+Entab all output files by default.
+.TP
+.B \-T
+Disable entabbing of output files, this is the default action.
+.TP
+.B \-b value
+Create backup copies of the output files, such that if more than
+.I value
+versions already exists the oldest version is deleted. The default value, if
+.B \-B
+is not used, is 1.
+.TP
+.B \-B value
+Similar to the
+.B \-b
+option except that at most
+.I value
+versions of the file are kept. All extra versions are deleted.
+.TP
+.B \-u
+Display a brief usage message as reminder of the various options available.
+.SH NOTES
+Ludwig uses a terminal description that identifies the ``function keys''
+available on the keyboard called TERMDESC. Ludwig accesses the terminal
+descriptions either through the translation of the environment variable
+TERMDESC, or if this does not exist Ludwig looks in the directory
+/usr/local/lib/termdesc. If the user wishes to have his/her own terminal
+descriptions then they should define TERMDESC to be the path to a
+directory containing binary terminal descriptions. Binary descriptions
+are created by using the ``termdesc-parser'' program.
+.SH SEE ALSO
+``The Ludwig User Guide'', available from
+.br
+Computer Science Department,
+.br
+University of Adelaide,
+.br
+GPO Box 498 Adelaide 5001 SA,
+.br
+AUSTRALIA.

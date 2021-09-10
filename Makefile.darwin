@@ -1,0 +1,388 @@
+#  This source file by:
+#
+#       Bevin R. Brett (1987);
+#       Martin Sandiford (1990-91, 2002, 2008, 2018).
+#
+#  Copyright  1987, 1990-91, 2002, 2008, 2018  University of Adelaide
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a 
+#  copy of this software and associated documentation files (the "Software"),
+#  to deal in the Software without restriction, including without limitation
+#  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+#  and/or sell copies of the Software, and to permit persons to whom the
+#  Software is furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+#  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+#  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#  DEALINGS IN THE SOFTWARE.
+#
+# $Header: /home/martin/src/ludwig/current/RCS/makefile.warning,v 4.2 1990/01/23 15:07:31 ludwig Exp $
+# ======================================================================
+#
+#                  ====================================
+#            ***** DO NOT MODIFY THIS MAKEFILE DIRECTLY *****
+#                  ====================================
+#
+# This makefile consists of the concatenation of
+#       ~/current/makefile.warning
+#       ~/current/?/makefile.definitions
+#       ~/current/makefile.body
+#
+# To modify the makefile, edit the appropriate file(s) as listed above,
+# and execute 'make makefile'.
+#
+# To contruct a makefile for a new system, copy 'makfile.definitions'
+# and 'makefile' from another system, edit 'makefile.definitions', and
+# execute 'make makefile'.
+#
+# Note that this is a makefile written for GNU Make (v 3.48 or higher).
+# If you are at the U of A, the gnumake should be installed on your system.
+# If it is not installed, then you can get the source from sirius.ua.oz.
+#
+# ======================================================================
+# ======================================================================
+# System dependent definitions and rules
+#
+# CPU:  ???
+# O/S:  Unknown O/S running Free Pascal
+# ======================================================================
+
+DEVELOPING=y
+
+# the type of system (unix, vms, ibm)
+SYS     = fpc
+
+# extension for pascal and object files. (usually p and o)
+P       = pas
+O       = o
+
+# on some systems, identifiers may not have underscores in them. If that is
+# so on your system (probably vax), define RM_ to be rm_.
+#RMUNDERSCORE  = rm_
+
+# if your system understands SIGWINCH'es and can read the size of a window
+# using the TIOCGWINSZ ioctl, then set WINDOWING to -DWINDOWCHANGE.
+# If you are not sure, then try to compile the program ioctl-test.c in the
+# tests directory. If it compiles then run it. It should print out the size of
+# of the window. Resize the window. It should then print out the new size of
+# the window.
+WINDOWING = -DWINDOWCHANGE
+
+# if you are building an X-windows version, set WINDOWING to -DXWINDOWS
+# and X to x, and XINCLUDES to the location of the X includes files.
+#WINDOWING = -DXWINDOWS
+#X = x
+#XINCLUDES = /usr/local/include
+
+# flags for pcc
+# (these should include -D's for each symbol defined by your C compiler)
+PC = fpc
+ifdef NDEBUG
+PCCFLAGS= -Dfpc -Dturbop -DISO1 $(WINDOWING)
+else
+PCCFLAGS= -Dfpc -Dturbop -DISO1 -Ddebug $(WINDOWING)
+endif
+
+ifdef NDEBUG
+PFLAGS  = -O2 -CX -XX -CPPACKRECORD=4
+else
+PFLAGS = -bl -g -gl -Sa -CPPACKRECORD=4
+endif
+
+# use gcc
+CC = gcc -Wall
+
+ifdef NDEBUG
+CFLAGS  = $(WINDOWING) -O -Dfpc -DMACOS -DTIME_T_SIZE=8
+else
+CFLAGS  = $(WINDOWING) -DDEBUG -Dfpc -DMACOS -DTIME_T_SIZE=8 -g
+endif
+
+LDFLAGS = -Fl/usr/local/lib
+LIBES =
+
+# where the sources are kept
+SRCDIR = ..
+
+# non-pascal sources for this system.
+
+SSRC    = ch.$P filesys.$P helpfile.$P msdos.$P vdu.$P filesys_c.c  helpfile_c.c
+SHED    = ch.i  filesys.i  helpfile.i  msdos.i  vdu.i
+SOBJ    = ch.$O filesys.$O helpfile.$O msdos.$O vdu.$O filesys_c.$O helpfile_c.$O
+
+USRC    = ludwighlpbld.c
+UOBJ    = ludwighlpbld.o
+
+# $Header: /home/medusa/projects/ludwig/current/RCS/makefile.body,v 4.17 91/02/22 14:34:26 ludwig Exp Locker: ludwig $
+# ======================================================================
+# System Independent definitions
+# ======================================================================
+
+# pascal files.
+ifeq ($(X),x)
+XMP = x-mouse.$P
+XMH = x-mouse.h
+XMO = x-mouse.$O
+endif
+
+LSRC    = arrow.$P caseditto.$P charcmd.$P code.$P dfa.$P eqsgetrep.$P \
+        exec.$P execimmed.$P fyle.$P frame.$P help.$P line.$P mark.$P \
+        nextbridge.$P opsys.$P patparse.$P quit.$P recognize.$P \
+        screen.$P span.$P swap.$P text.$P tpar.$P user.$P validate.$P \
+        value.$P window.$P word.$P newword.$P \
+        ludwig.$P $(XMP)
+LINC    = const.i type.i var.i version.i
+LHED    = arrow.i  caseditto.i  charcmd.i  code.i  dfa.i  eqsgetrep.i  \
+        exec.i  execimmed.i  fyle.i  frame.i  help.i  line.i  mark.i  \
+        nextbridge.i  opsys.i  patparse.i  quit.i  recognize.i  \
+        screen.i  span.i  swap.i  text.i  tpar.i  user.i  validate.i  \
+        value.i  window.i  word.i  newword.i $(XMH)
+LOBJ    = arrow.$O caseditto.$O charcmd.$O code.$O dfa.$O eqsgetrep.$O \
+        exec.$O execimmed.$O fyle.$O frame.$O help.$O line.$O mark.$O \
+        nextbridge.$O opsys.$O patparse.$O quit.$O recognize.$O \
+        screen.$O span.$O swap.$O text.$O tpar.$O user.$O validate.$O \
+        value.$O window.$O word.$O newword.$O lwgetopt.$O
+
+HSRC    = ludwighlp.t   ludwignewhlp.t
+HIDX    = ludwighlp.idx ludwignewhlp.idx
+
+PCC     = pcc $(PCCFLAGS)
+ifeq ($(SYSTYPE),)
+LUD     = SYSTYPE=$(SYS);export SYSTYPE;ludwig -O -t -M
+else
+LUD     = SYSTYPE=$(SYSTYPE);export SYSTYPE;ludwig -O -t -M
+endif
+MVCHNG  = $(SRCDIR)/move-if-change
+
+# file to use with ludwig to extract pascal .i files
+MAKEHEADER = $(SRCDIR)/make-header.$(SYS).lud
+
+# ======================================================================
+# The rules.
+# ======================================================================
+
+#$(X)ludwig: $(LOBJ) $(SOBJ)
+#       $(PC) $(PFLAGS) $(LDFLAGS) -o $(X)ludwig $(LOBJ) $(SOBJ) $(LIBES)
+
+$(X)ludwig: $(LOBJ) $(SOBJ) $(X)ludwig.pas
+	$(PC) $(PFLAGS) $(LDFLAGS) $(X)ludwig.pas
+
+all:    sources $(X)ludwig ludwig-help
+
+sources: $(LSRC) $(LINC) $(LHED) $(SSRC) $(SHED) $(HSRC) $(USRC)
+
+ludwig-help: $(HIDX)
+
+filesys_c.$O: filesys_c.c type.h
+lwgetopt.$O: lwgetopt.c type.h
+
+helpfile_c.$O: helpfile_c.c type.h
+
+arrow.$O: arrow.$P arrow.i const.i type.i var.i \
+	line.i mark.i screen.i text.i vdu.i
+
+caseditto.$O: caseditto.$P caseditto.i const.i type.i var.i \
+	ch.i mark.i screen.i text.i vdu.i 
+
+ch.$O: ch.$P ch.i
+
+charcmd.$O: charcmd.$P charcmd.i const.i type.i var.i \
+	ch.i mark.i screen.i text.i vdu.i
+
+code.$O: code.$P code.i const.i type.i var.i \
+	ch.i exec.i frame.i line.i mark.i screen.i tpar.i vdu.i 
+
+dfa.$O: dfa.$P dfa.i const.i type.i var.i \
+	screen.i
+
+eqsgetrep.$O: eqsgetrep.$P eqsgetrep.i const.i type.i var.i \
+	ch.i charcmd.i mark.i screen.i text.i patparse.i dfa.i recognize.i
+
+exec.$O: exec.$P exec.i const.i type.i var.i \
+	arrow.i caseditto.i ch.i charcmd.i code.i eqsgetrep.i fyle.i \
+	frame.i help.i line.i mark.i nextbridge.i opsys.i quit.i screen.i \
+	span.i swap.i tpar.i text.i user.i validate.i vdu.i window.i \
+	word.i newword.i  $(XMH)
+
+execimmed.$O: execimmed.$P execimmed.i const.i type.i var.i \
+	code.i exec.i fyle.i line.i mark.i screen.i text.i vdu.i 
+
+fyle.$O: fyle.$P fyle.i const.i type.i var.i \
+	ch.i exec.i filesys.i line.i mark.i screen.i tpar.i  vdu.i
+
+# filesys.$O: filesys.c const.h type.h
+
+frame.$O: frame.$P frame.i const.i type.i var.i \
+	line.i span.i mark.i ch.i screen.i vdu.i tpar.i dfa.i 
+
+help.$O: help.$P help.i const.i type.i var.i \
+	ch.i helpfile.i screen.i
+
+line.$O: line.$P line.i const.i type.i var.i \
+	ch.i screen.i 
+
+#ludwig.$O: ludwig.$P const.i type.i var.i \
+#	ch.i exec.i execimmed.i fyle.i frame.i quit.i screen.i vdu.i 
+
+mark.$O: mark.$P mark.i const.i type.i var.i \
+	screen.i 
+
+nextbridge.$O: nextbridge.$P nextbridge.i const.i type.i var.i \
+	mark.i
+
+opsys.$O: opsys.$P opsys.i const.i type.i var.i \
+	filesys.i line.i screen.i
+
+patparse.$O: patparse.$P patparse.i const.i type.i var.i \
+	ch.i screen.i tpar.i
+
+quit.$O: quit.$P quit.i const.i type.i var.i \
+	fyle.i screen.i tpar.i vdu.i 
+
+recognize.$O: recognize.$P recognize.i const.i type.i var.i
+
+screen.$O: screen.$P screen.i const.i type.i var.i \
+	ch.i line.i vdu.i 
+
+span.$O: span.$P span.i const.i type.i var.i \
+	ch.i code.i fyle.i line.i mark.i screen.i 
+
+swap.$O: swap.$P span.i const.i type.i var.i \
+	mark.i text.i
+
+text.$O: text.$P text.i const.i type.i var.i \
+	ch.i line.i mark.i screen.i vdu.i 
+
+tpar.$O: tpar.$P tpar.i const.i type.i var.i \
+	ch.i screen.i span.i swap.i 
+
+user.$O: user.$P user.i const.i type.i var.i \
+	code.i mark.i screen.i span.i text.i tpar.i  vdu.i
+
+validate.$O: validate.$P validate.i const.i type.i var.i \
+	screen.i
+
+value.$O: value.$P value.i const.i type.i var.i version.i
+
+vdu.$O: vdu.$P vdu.i const.i type.i var.i
+
+#ifeq ($(X),x)
+#
+#xvdu.$O:  xvdu.c const.h type.h termdesc.h
+#       $(CC) $(CFLAGS) -I$(XINCLUDES) -c $<
+#
+#x-mouse.$O: x-mouse.$P x-mouse.i const.i type.i var.i vdu.i
+#
+#else
+#
+#vdu.$O:  vdu.c const.h type.h termdesc.h
+#
+#endif
+
+window.$O: window.$P window.i const.i type.i var.i \
+	frame.i line.i mark.i screen.i vdu.i
+
+word.$O: word.$P word.i const.i type.i var.i \
+	line.i mark.i text.i
+
+newword.$O: newword.$P newword.i const.i type.i var.i \
+	line.i mark.i text.i
+
+ludwighlpbld: ludwighlpbld.c
+	$(CC) $(CFLAGS) -o ludwighlpbld ludwighlpbld.c
+
+ludwighlp.idx:  ludwighlpbld ludwighlp.t
+	./ludwighlpbld ludwighlp.t ludwighlp.idx
+
+ludwignewhlp.idx:  ludwighlpbld ludwignewhlp.t
+	./ludwighlpbld ludwignewhlp.t ludwignewhlp.idx
+
+#tidy:
+#	rm -f $(LSRC)
+#	rm -f $(LINC)
+#	rm -f $(LHED)
+#	rm -f $(LOBJ)
+#	rm -f $(SSRC)
+#	rm -f $(SHED)
+#	rm -f $(SOBJ)
+#	rm -f $(HSRC)
+#	rm -f $(USRC)
+#	rm -f $(UOBJ)
+
+clean:  # tidy
+	rm -f *.$O
+	rm -f *.ppu
+	rm -f ludwighlpbld
+
+realclean: clean
+	rm -f $(X)ludwig
+	rm -f $(HIDX)
+
+# gnumake pattern rules.
+
+# how to get a .$P file from a $(SRCDIR)/.pas file.
+%.$P: $(SRCDIR)/%.pas
+	$(PCC) < $< > $@.tmp
+	mv $@.tmp $@
+
+# how to get a .i file from a .$P file. only want to actually update the time
+# stamp on the header file if it has actually changed. (this can save a lot of
+# unneccessary compilation). (this dependency and rule is disabled if the
+# symbol DEVELOPING is set to non-nil),
+ifeq ($(DEVELOPING),)
+%.i: %.$P $(MAKEHEADER)
+	$(LUD) -B 0 -i $(MAKEHEADER) $< $@.tmp > /dev/null
+	$(MVCHNG) $@.tmp $@
+endif
+
+# ludwig include files (.i ones)
+%.i : $(SRCDIR)/%.i
+	$(PCC) < $< > $@.tmp
+	mv $@.tmp $@
+
+# system dependent files.
+%.c : $(SRCDIR)/%.c.$(SYS)
+	$(PCC) < $< > $@ || ( rm -f $@ ; exit 1)
+
+%.pas : $(SRCDIR)/%.pas.$(SYS)
+	$(PCC) < $< > $@ || ( rm -f $@ ; exit 1)
+
+%.i : $(SRCDIR)/%.i.$(SYS)
+	$(PCC) < $< > $@ || ( rm -f $@ ; exit 1)
+
+# header files from system includes
+ifeq ($(DEVELOPING),)
+vdu.h : $(X)vdu.c $(MAKEHEADER)
+	$(LUD) -B 0 -i $(MAKEHEADER) $< $@.tmp > /dev/null
+	$(MVCHNG) $@.tmp $@
+
+%.h : %.c $(MAKEHEADER)
+	$(LUD) -B 0 -i $(MAKEHEADER) $< $@.tmp > /dev/null
+	$(MVCHNG) $@.tmp $@
+endif
+
+# have to run the help files through pcc before can index them
+%.t: $(SRCDIR)/%.t
+	$(PCC) < $< > $@ || ( rm -f $@ ; exit 1)
+
+# need to check things out of RCS
+$(SRCDIR)/%.pas: $(SRCDIR)/RCS/%.pas,v
+	$(CO) $< $@
+
+$(SRCDIR)/%.$(SYS): $(SRCDIR)/RCS/%.$(SYS),v
+	$(CO) $< $@
+
+# implicit rules for .$O from .$P or .c
+
+%.$O : %.$P
+	$(PC) $(PFLAGS) -Cn $<
+
+%.$O : %.c
+	$(CC) $(CFLAGS) -c $<
