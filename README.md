@@ -10,7 +10,7 @@
 {**********************************************************************}
 ```
 
-#ABOUT
+# ABOUT
 
 Ludwig is a text editor developed at the University of Adelaide. 
 It is an interactive, screen-oriented text editor.
@@ -20,7 +20,7 @@ or any other text which consists only of printable characters.
 Ludwig may also be used on hardcopy terminals or non-interactively, 
 but it is primarily an interactive screen editor.
 
-#Building
+# Building
 
 You will need to install Free Pascal Compiler (fpc) if you are building ludwig on linux.
 
@@ -31,7 +31,7 @@ make -f Makefile.linux NDEBUG=1 	(or .darwin)
 This will produce `ludwig` which can be copied to your 
 preferred directory for local binaries, eg `/usr/local/bin`. 
 
-#Usage
+# Usage
 
 Open/create a file with name <file-name>
 
@@ -49,7 +49,7 @@ Or with some additional initialisation parameters
 
         -i initialisation file (optional) executed after .ludwigrc
         
-#Help
+# Help
 
 There are two help files
 
