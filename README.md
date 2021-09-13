@@ -22,6 +22,8 @@ but it is primarily an interactive screen editor.
 
 #Building
 
+You will need to install Free Pascal Compiler (fpc) if you are building ludwig on linux.
+
 ```
 make -f Makefile.linux NDEBUG=1 	(or .darwin)
 ```
