@@ -1,0 +1,186 @@
+! This is a Command Procedures in Ludwig v5 (v5 is invoked with commmand line option -O).
+! Use this as an initialisation file, or copy into .ludwigrc which will execute on startup.
+! It assign wordprocessor functions to function keys F1 .. F10 on a Mac keyboard.
+
+! Command Procedure to go to end of line or beginning alternately
+sa/ends-key/function-1/                           ! alias
+  sa#ends#
+   >eol[<ac                                       ! if at or past EOL, jump to beginning of line
+        eol[al:]                                  ! if empty line advance line
+       :>ac                                       ! else jump to EOL
+       ]
+   #
+km#$ends-key$#$ends$#
+
+! çommand Procedure Cut
+sa/wp-cut-key/function-2/                                 ! alias for function-2
+km#$wp-cut-key$#                                          !cut
+sd/wp-clip/ sa/wp-clipboard/$wp-clip$/ @dc
+#
+
+! Copy
+sa/wp-copy-key/function-3/                               ! alias for function-3
+km#$wp-copy-key$#
+sd/wp-clip/ sa/wp-clipboard/$wp-clip$/
+#
+
+! Paste
+sa/wp-paste-key/function-4/                              ! alias for function-4
+km#$wp-paste-key$#
+sc/wp-clipboard/
+#
+
+! Smart Kill: Delete text to right of dot, unless at eol, then delete left.
+                                              ! if line empty, delete line.
+sa/wp-smart-kill-key/function-5/                ! alias
+km#$wp-smart-kill-key$#
+ >eol[ <ac >ac
+         eqc/1/[dl : <dc]
+       : >dc
+       ]
+  #
+
+! Insert Line above dot
+sa/wp-insert-line-key/function-6/                         !alias
+km#$wp-insert-line-key$#
+CL
+#
+
+! Split/Join
+sa/wp-split-join-key/function-7/                ! alias
+sa#split#                                       ! named function
+ >eol[ eol[ac] ao" " =dc                        !join
+     : 0aw tb =ac                               !split and stay at end
+     ]
+  #
+km#$wp-split-join-key$#$split$#
+
+
+! Fill Paragraph between margins, ragged right.
+sa/wp-fill-key/function-8/
+  sa#fill#
+  <ac
+  eol[ ao" " >kl [ =dc : -cc >( >kl[xs : -cc])]]
+  >tfs =ac >tff
+!  v&JUSTIFY?&=ac [>TFJ:]                                       ! right justify text after fill?
+  #
+ km#$wp-fill-key$#$fill$#
+
+! Insert current Tab-Rack or define new Tab-Rack, alternately..
+! sa/wp-tab-rack-key/function-9/         ! Do not use keyboard, use "OTHER" key, with name "tab-key" or "tabs"
+ sa#tab-rack#                            ! Must have name "tab-rack" WTF?
+   0ac =sd/wp-dot/ 0al sc/wp-dot/        !remember position of Dot
+   v$wp-tab-rack-flag$                   !if tab-rack-flag
+   [ sj/wp-tab-rack/                     !  if tab-rack exists
+     [ 0al eqm/%/                        !    if Dot was on tab-rack
+       [ sj/wp-dot/                      !      restore Dot
+         ep/t=r/                         !      define tabs and margins from inserted tabrack,
+                                         !      possibly edited.
+         [ ep/k=i,o=w/                   !        set insert mode, wrap option
+           sa/wp-tab-rack-flag/n/        !        clear tab-rack-flag
+          xs                            !        exit
+         : xf                            !      else exit with beep
+         ]
+       : dl                              !    else remove old rack
+       ]
+     ]
+   ]
+   sj/wp-dot/                            !restore Dot
+   ep/t=i,k=o,o=-w/                      !insert tab-rack,overtype,no wrap
+   0ac =sd/wp-tab-rack/                  !remember position
+   sa/wp-tab-rack-flag/y/                !set tab-rack-flag
+   #
+!  km#$wp-tab-rack-key$#$tab-rack$#      ! Do not use keyboard, use "OTHER" key
+
+sa#tabs#$tab-Rack$#                      ! alias for "tab-rack"
+
+sa/wp-tab-rack-key/function-9/
+km#$wp-tab-rack-key$#
+  sx/tab-rack/  #
+
+ ! EXTENDED COMMANDS
+
+sa#wp-insert-menu#
+
+  0ac =sd/wp-dot/                               !remember Dot
+
+  kh 16al[: >al]         !24 -1 -7 {the number of lines in menu}
+
+  sc/wp-menu/ =sd/wp-menu-span/                 !insert menu, remember where
+
+  =ac 2al ao" "                                 !move to first option
+
+  sa/wp-menu-flag/y/                            !set flag
+
+  #
+
+
+sa#wp-menu#
+
+--------------------- Extended Command Menu -------------------------------
+
+Tab-Rack     Fill       Justify    Squeeze     Justify-Right  Justify-Left
+
+Centre-Line  Time       Date       Upper-Case  Lower-Case     Edit-Case
+
+Help         Help-Keys
+
+
+
+
+
+-------Select, then press Command key to execute, or Gold to cancel--------
+
+#
+
+
+
+sa#wp-remove-menu#
+
+  sj/wp-menu-span/ -sj/wp-menu-span/ =dc        !remove inserted menu
+
+  sa/wp-menu-flag/n/                            !clear flag
+
+  sj/wp-dot/                                    !restore Dot
+
+  #
+
+! Invoke Extended Commands by name
+   sa/other-key/function-10/                                    ! alias for function key
+   sa#other#                                                    ! name the function
+      sa/what-command/&Extended Command Name: &/                ! ask for an Extended Command name
+      sx/$what-command$/                                        ! execute it
+     #
+    km#$other-key$#$other$#                                     ! bind other-key to named function
+
+!Repeat last extended command
+ sa/repeat-key/function-9/
+ sa#repeat#sx/$what-command$/#
+ km#$repeat-key$#$repeat$#
+
+sa#date#'ox/date/'#                             ! 'date' is an extended command, invoked by 'other'
+
+sa#term#?terminal-name?#
+sa#terminal#                                    ! 'terminal' is an extended command, invoked by 'other'
+           sc/term/
+           #
+
+sa#OS#?ludwig-opsys?#
+sa#opsys#                                       ! 'opsys' is an extended command, invoked by 'other'
+        sc/OS/
+        #
+
+
+sa#LV#?ludwig-version?#
+sa#version#                                     ! 'version' is an extended command, invoked by 'other'
+          sc/LV/
+          #
+
+
+
+
+
+
+
+
+
