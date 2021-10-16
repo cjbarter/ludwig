@@ -1,0 +1,1203 @@
+
+THE LUDWIG USER GUIDE
+
+        Version 5.0 April 1990
+
+        Author:   Chris J Barter October 2021
+
+
+TABLE OF CONTENTS
+
+INTRODUCTION TO THE LUDWIG SCREEN EDITOR
+
+        Installing Ludwig
+        Files
+        Getting Started
+
+BASIC EDITING IN LUDWIG
+
+        The Cursor and Dot
+        Navigating the Screen
+
+LUDWIG COMMANDS
+
+THE INTERACTIVE HELP FACILITY
+
+        Invoking Help on Commands
+        Displaying an Index of Help Topics
+
+BASIC EDITING COMMANDS
+
+        Basic Command Summary
+        Control Code Assignments
+        User Mapped Keyboard Commands
+
+SEARCH AND REPLACE
+
+        The Get Command G
+        The Replace Command R
+
+SPANS
+
+        The concept of a Span of text
+        Commands that operate on Spans
+
+FRAMES
+
+        The concept of a Frame as an editing environment
+        Spans and Frames
+        Multiple Frames and inbuilt Frames
+
+EDITOR PARAMETERS
+
+        The editing environment
+        Inspecting the current parameters
+
+USING FILES
+
+        Frames and attached Files
+        Globally acessible Files
+
+ELEMENTARY TEXT PROCESSING
+
+        Definition of a "Word"
+        Operations involving Words
+        Text Formatting
+        Naviigating by Words and Paragraphs
+
+ARGUMENT DELIMITERS
+
+        Use of Delimiters
+        Special Delimiters
+
+LEADING PARAMETERS
+
+LUDWIG COMMAND PROCEDURES
+
+        Composing Procedures
+        Executing Procedures
+        Syntax Errors and Editing Procedures
+        Compilation of Procedures
+
+CONTROL FLOW
+
+        Command Execution
+        Success, Failure and Abort on execution
+        Exit Handlers
+        User-Specified Exit Handling
+        The Compiler
+
+PATTERN MATCHING
+
+        Pattern Specifications
+        Regular Expressions
+        Strings
+        Sets
+        Positionals
+        Marks
+        Ranges
+        Dereferenced Patterns
+        Alternates
+        Contexts
+
+UNIX COMMAND LINE OPTIONS
+
+        Syntax and Options
+
+OLD AND NEW COMMAND NAMES
+
+THE COMPLETE COMMAND SUMMARY - Useful to have handy
+
+HINT    It is intended that this User Guide be opened in Ludwig so that the Ludwig Help facility can be
+        accessed at any time to elaborate further on topics being described in this guide.
+        See at the end of the INTRODUCTION section for details.
+
+                                --------------------------------
+
+INTRODUCTION TO THE LUDWIG SCREEN EDITOR
+
+Ludwig provides support for the creation and editing of text files comprised of lines of text.
+
+It recognises <End of File> and <End of Line>
+
+This user guide will assume a Unix environment, such as linux and Darwin on a Mac.
+
+We assume that the ludwig binaries are installed in some convenient place e.g. /user/local/bin
+and help files are also installed e.g. in /user/local/help.
+
+A new file can be created, or an existing file opened for editing with the command line
+
+         ludwig <file-name>
+
+The file .ludwigrc in your home directory can contain initialisation parameters and editing options that
+are invoked when a ludwig session commences.
+
+The syntax for the command line is
+
+        ludwig [editor parameters and options] [<input file-name>] [output file-name>]
+
+where [ ... ] indicates optional components. In the example above, there are no parameters specified, and
+the <output file-name> defaults to the <input file-name>
+
+If no file is named, ludwig defaults to the most recent file used.
+
+        ludwig -O -i <initialisation-file-name> <file_name>
+
+                -O invokes Version 5 command names
+
+                -i specifies and initialisation, executed after .ludwigrc
+
+Once in a Ludwig editing session, basic editing operations from the keyboard such as typing additions,
+insert and deletions are as expected. Commands within Ludwig are typed with a command introducer, by
+default the backslash "\". Two basic commands are "Help" \H and "Quit" \Q .
+
+HINT:   It is intended that this User Guide be opened in Ludwig so that the Ludwig Help facility can be
+accessed at any time to elaborate further on topics being described in this guide.
+
+        ludwig -O -r <this-user-guide>                  (-r = read-only for obvious reasons)
+
+Search for sections of interest in Table of Contents by Get command \G <Section-Name>
+Return to Table of Contents CNTRL/t
+
+
+BASIC EDITING IN LUDWIG
+
+The Cursor is visibly *on* a character on the screen, and has a location value used in some commands.
+Ludwig also defines "Dot" as a virtual position between the cursor and the preceding character (or left
+margin if the cursor is at the left margin). Many Ludwig commands are defined in relation to Dot, and
+some commands such as Get (G) move both Dot and Cursor, the result being the span of characters between
+Dot and Cursor.
+
+Typing inserts characters to the right of Dot. ( "insert mode" is the default, can be changed to
+"overtype mode").
+
+Navigating the text on the screen is achieved by using the keyboard to move Dot (and Cursor):
+
+ <RETURN>      Carriage Return   Places Dot on next line on margin or indent
+ <LINEFEED>    Keyboard Down     Moves Dot to next line
+ <TAB>         Tab               Moves Dot to the next tab stop
+ <BACKSPACE>   Backspace         Moves Dot to left
+ <DELETE>      Delete            Delete the previous character, move Dot left
+ <BACKTAB>     Backtab           Moves Dot to the previous tab stop
+ Left  Arrow   Keyboard Left     Moves Dot to left (same as Backspace)
+ Right Arrow   Keyboard Right    Moves Dot to right
+ Up    Arrow   Keyboard Up       Moves Dot to previous line
+ Down  Arrow   Keyboard Down     Moves Dot to next line
+ Home          Keyboard Home     Moves Dot to the home positionexample typing
+
+Support is available for mouse actions, such as scrolling and moving the Cursor by mouse click.
+
+Ludwig was originally designed for terminals with fixed height and width in terms of number of
+characters displayed, but with the advent of bit-map displays, there are two cursors, one being the
+Ludwig Cursor defined as a character position in the text and the other being the mouse cursor on the
+bit-map display.   (on a Mac keyboard, option-click moves the cursor and Dot).
+
+(Using a text editor or Microsoft Word on a bit-map display, the cursor is shown as a vertical line to
+the left of a character, and has the same semantics as what we call "Dot")
+
+
+LUDWIG COMMANDS
+
+The Ludwig command equivalent to down arrow is Advance Line, "AL" or "al" (not case-dependent).
+
+Commands can be entered by typing a COMMAND INTRODUCER, which by default is the character "\"
+So typing \AL will advance the cursor by one line. \9AL moves 9 lines.  \>AL moves to <end-of-file>
+
+The command Keyboard Down, KD, does the same, as does control J = CTRL/J = Linefeed also the same.
+
+An important command is the QUIT command \Q, which writes the <output-file> with edit changes, and closes
+the editing session. So far, there is enough editing features described above to open a file, navigate
+text and add and delate text and save changes by quitting. To discover more advanced facilities, the
+HELP facility is useful.
+
+
+THE INTERACTIVE HELP FACILITY
+
+The help facility is invoked by the HELP COMMAND invoked by  \H
+
+It will respond with the prompt
+
+        Topic   :
+
+and the user can name the command of interest, and read the description, then return to editing.
+
+If no command name is entered, an index of help topics is displayed:
+
+    0. Main Help Menu
+    1. Ludwig Basic Command Summary
+    2. Control Code Commands
+    3. Complete Command Summary
+    4. Trailing Parameters
+    5. Use of the Pattern Matcher
+    6. Keyboard Interface
+    7. Changes between V4.0 and V4.1
+
+Invoking help by typing \H and entering the topic number returns help on that topic.
+
+Typing \AL will get help on the Advance Line command
+Typing \A  will get help on all commands beginning with "A"
+
+USEFUL TIP
+
+If this User Guide is opened in ludwig (in read-only mode)
+
+        ludwig -O -r <this-user-guide>
+
+then, as commands are being mentioned in this text, the \H command can be invoked for a full description.
+
+
+BASIC EDITING COMMANDS
+
+The default editing mode is "insert mode", where typing inserts characters into the file. There is a mode
+which overtypes existing text. \TO and \TI toggle this.
+
+Typing \H and reply  : 1      displays the basic editing commands.
+
+ 1. Ludwig Basic Command Summary
+    ===============================
+      Symbol  Name            Action
+      ------------------------------------------------------------------------
+       AC     Advance Char    Moves Dot left or right
+       AL     Advance Line    Moves forward or backward n lines
+       AO     Advance Over    Gets next occurrence of a character
+       CC     Create Char     Inserts n spaces before Dot
+       CL     Create Line     Inserts n blank lines above Dot
+       DC     Delete Char     Deletes n characters
+       DL     Delete Line     Deletes n lines
+       G      Get             Gets nth occurrence of a string
+       H      Help            Help on a command or topic
+       KI     Insert mode     Insert option--typed text is inserted
+       KO     Overtype Mode   Overtype option--typed text overwrites existing
+       M      Mark            Defines a mark.  nM defines mark 1..9
+       Q      Quit            Exits from editor
+       R      Replace         Replaces one string with another
+       SD     Define Span     Defines and names a span
+       SC     Span Copy       Copies a previously defined span
+       TS     Text Swap       Swaps current line with one below (or above)
+       "      Ditto           Copies characters from the line above
+
+As you would expect, there is facility to search for occurrences of strings of characters in the text
+(Get G, and Replace R). An important concept introduced here is notion of a "span", which is defined to
+be a contiguous sequence of characters in the text, of any length, which can be named, copied and moved
+and otherwise operated on. This will be discussed later.
+
+A complete command summary can be found in Help Topic 3 - \H RETURN, then choose 3.
+
+Keyboard control codes have default interpretation in Ludwig, and provide convenient short-cuts for common
+operations.
+
+Typing \H and reply  : 2      displays control code command equivalents.
+
+   2. Control Code Commands
+    ========================
+
+  Control codes are mapped to Ludwig commands as follows:
+
+  CTRL/@                  Not used
+  CTRL/A                  Not used
+  CTRL/B                  Window Backward              { Same as WB }
+  CTRL/C                  Not used
+  CTRL/D                  Delete Char                  { Same as DC }
+  CTRL/E                  Window End                   { Same as WE }
+  CTRL/F                  Window Forward               { Same as WF }
+  CTRL/G                  Execute frame COMMAND        { Same as SX/COMMAND/ }
+  CTRL/H or <BACKSPACE>   Cursor Left                  { Same as KL }
+  CTRL/I or <TAB>         Tab                          { Same as KT }
+  CTRL/J or <LINEFEED>    Cursor Down                  { Same as KD }
+  CTRL/K                  Delete Line                  { Same as DL }
+  CTRL/L                  Create Line                  { Same as CL }
+  CTRL/M or <RETURN>      Carriage Return              { Same as KC }
+  CTRL/N                  New Window                   { Same as WN }
+  CTRL/O                  Not used
+  CTRL/P                  Type the command introducer  { Same as UC }
+  CTRL/Q                  Not used
+  CTRL/R                  Cursor Right                 { Same as KR }
+  CTRL/S                  Not used
+  CTRL/T                  Window Top                   { Same as WT }
+  CTRL/U                  Cursor Up                    { Same as KU }
+  CTRL/V                  Not used
+  CTRL/W                  Advance Word                 { Same as AW }
+  CTRL/X                  Not used
+  CTRL/Y                  Not used
+  CTRL/Z                  Not used
+  CTRL/[                  Not used        { Escape sequence introducer }
+  CTRL/\                  Not used
+  CTRL/]                  Not used
+  CTRL/^                  Create Character             { Same as CC }
+  CTRL/_                  Not used
+
+Note CTRL/G will repeat the execution of the previous command executed, stored in the span "COMMAND"
+
+
+User mapped keyboard commands
+=============================
+The Keyboard Map command KM allows commands and command procedures to be mapped to keyboard keys.
+
+It takes two parameters:
+
+          KM/key name/command procedure/
+
+The key names are defined by the keyboard interface (see \H Help topic 6). The command procedure may
+contain multiple lines of text.
+
+The command will fail if the key name is not supported by the user's terminal. If the compilation of the
+command procedure fails, the command aborts and errors are reported in the same way as by the Execute EX
+command. There is an example command proceure in the Ludwig Repo called f-keys which implements some
+useful word processing functions.
+
+
+SEARCH AND REPLACE
+
+The Get command G performs a pattern directed string search. The pattern may be a simple string, or an
+expression in a general pattern matching language. For patterns which are simple character strings,
+inexact case matching is the default.
+
+Exact case matching is performed if the search string is given in double quotes, e.g. "Cat". If a null
+pattern is specified, the Get command will use the pattern last used in the current frame, if any.
+
+The result of a search is displayed, and the user is asked to verify the result. Type "Y" or SPACE for
+YES, and type "N" or REYURN for NO.
+
+After a successful search, Dot is at the character after the matched string, and the Equals mark (=) is
+the first character of the string. The position of Dot and Equals are reversed after a backward search.
+
+The command remembers the previous search specification, so \G RETURN will repeat the search, So does
+CNTRL/G
+
+See ARGUMENT DELIMITERS later and Trailing Parameters, Topic 4 in Help.
+
+The REPLACE command R, takes two parameters, the first as specified above for GET, and the second string
+to replace the first on a successful match.
+
+SPANS
+
+To define a span of characters, the command MARK, M, is used to remember the position of Dot at one end
+of the string, and move the cursor to the other end, and the command SPAN DEFINE SD allows the span to be
+named. e.g. SD'Foo' will enter the span with the name 'Foo' into a list of spans. This list can be inspected at any time by
+the SPAN TABLE command ST.
+
+The concept of spans is fundamental to the advanced features of Ludwig. There are many operations
+involving spans, see help file \H reply "S" for all commands starting with "S":
+
+   SA     Span Assign         Assigns text to a span
+   SC     Span Copy           Copies a previously defined span
+   SD     Span Define         Defines and names a span
+   SE     Span Execute        Executes a span
+   SJ     Span Jump           Jumps to the beginning or end of a span
+   SM     Span Move           Moves a previously defined span (not a copy)
+   SR     Span Recompile      Recompiles a span
+   ST     Span Table          Lists all spans and frames
+   SX     Span Execute        Compiles and executes a span.
+
+Note the command SPAN EXECUTE SX, which will assume the span contents is an executable Ludwig COMMAND
+PROCEDURE. As will be explained later, Ludwig commands can be employed to write programs called COMMAND
+PROCEDURES, which can be compiled and executed.
+
+
+FRAMES
+
+A second concept is that of FRAMES. When ludwig opens with an <input-file>, the editing environment is in
+the context of a Frame named LUDWIG, which has <input-file> and usually an <output-file> attached to it.
+
+Other Frames may be created with their own input and output files attached, and the user can move between
+frames by selecting which Frame is to be the current editing Frame..
+
+Text may be moved between frames by using SPAN operations. Span names are global to all Frames.
+
+The Span commands Span Define (SD), Span Copy (SC)  and Span Move (SM) effect cut copy and paste
+operations within a Frame, or between Frames.
+
+With modern terminal handlers, copy and paste operations such as Command-C and Command-V on a Mac can be
+employed to move text between Frames, and indeed between any text application in the operating system
+environment. A lot of this file content has been copy-pasted from the ludwignewhlp.idx file, opened up as
+a text file. That is a lot easier than using Span commands for copy/paste (not cut).
+
+Interactive keyboard editing is done within the current Frame. The Edit command (ED) can create a new
+Frame, or move the focus of attention to an existing Frame with its associated editing environment. The
+Edit Return command (ER) unwinds the ED command and returns to the previous environment.
+
+The command ST lists a table of all existing Spans and also Frames. A Frame can be thought of as a superset
+of a Span, and Span commands such as SC and SM can specify a Frame name to copy or move the entire
+contents of a Frame.
+
+The initial Frames are:
+
+       LUDWIG     the default editing frame.
+       COMMAND    the command frame. FX and TX place commands here and compile and execute them.
+       OOPS       all text deleted from any other frame is placed here.
+       HEAP       a special scratch frame, to support special commands and recursion.
+
+
+EDITOR PARAMETERS
+
+There is a set of default parameters describing the editing environment, such as whether typing is by
+character insertion at Dot, or overtyping characters at Dot. There are various default values for the
+maximum file size, the position of tabs and Left and Right margins, text indentation, text word wrap
+and the behaviour of the cursor when RETURN is pressed (move to next line, inserting a new line or not).
+
+Invoking \EP without any argument will display the current parameters.
+
+   Parameters                         Current               Defaults
+   ----------                         --------              --------
+   Keyboard Mode                      K = Insert Mode
+   Command introducer                 C =
+   Maximum memory available in frame  S =   500000       --     500000
+   Screen height  (lines displayed)   H =       70       --         70
+   Screen width   (characters)        W =      140       --        140
+   Editing options                    O = (W)            --     None
+   Horizontal margins                 M = (1,105)        --   (1,140)
+   Vertical margins                   V = (11,11)        --   (11,11)
+   Tab settings                       T =
+L       T       T       T       T       T       T       T       T       T       T       T       T       R
+
+Note that the default L and R margins were (1,140)
+Executing \EP'M=(1,105)' resulted in the change shown to the current margins.
+
+Similarly, \'EP(O=W)' turned on word wrap at <end-of-line>
+
+For writing code, an indentation tracker is useful, using EP'(O=I)'
+
+These can be grouped, e.g.     EP'O=(W,I,N)'
+
+Editor parameters can be changed for the current environment, or selectively for all Frames
+(Prefix command with character "$" e.g. \$EP= ...
+
+All edit parameters can be seen by executing \H on EP, and reproduced below:
+
+ <<<<<<<<<<<<<<<<
+  at frame creation; the parameter values for the current frame may be changed
+  at any time by the Editor Parameters command.  A "$" prefixed to a parameter
+  assignment refers to the global default value, and the new value will be
+  used in new frames.  An empty trailing parameter (<RETURN> after the prompt)
+  produces a display of the current parameters in the following order:
+
+      K    keyboard :
+           =I     insert from keyboard (default)
+           =O     overtype from keyboard
+           =C     commands executed from keyboard without command introducer
+
+      C    interactive command introducer  (default is ")
+           The introducer can be a single ASCII character not in the set
+           [' ','A'..'Z','a'..'z'], or any key name supported by the keyboard
+           interface.  This parameter can only be defined in screen mode.
+
+      S    memory space limit (default 500000 characters)
+
+      H    screen height
+
+      W    screen width
+
+      O    editor options:    (all off by default)
+           =S     Show current options
+           =W     Wrap at right margin
+           =I     Indentation tracker, <RETURN> to current indentation, not
+                  margin
+           =N     Newline when <RETURN> is pressed in insert mode
+
+      M    left and right margin settings (default is M=(1,terminal_width))
+                  The character "." represents the column containing Dot.
+
+      V    top and bottom margin settings (default depends on terminal height)
+
+      T    set and clear tabs:
+           =(c1,c2,...cn) for tabs at columns c1,c2,...cn
+           =D     return to default tab setting
+           =S     set a tab at Dot
+           =C     clear a tab at Dot
+           =T     set tabs using the current line as a template
+           =I     insert a line in the text showing tab stops and margins
+           =R     set tabs and margins using the current line as a ruler--
+                    as inserted by T=I
+
+  EXAMPLES:
+     EP'H=15'       set the screen height to 15 lines
+     EP'O=I'        turn on the indentation tracker
+     EP'O=-I'       turn off the indentation tracker
+     EP'M=(12,70)'  set left margin to column 12, right margin to column 70
+     EP'M=(20)'     set left margin to column 20
+     EP'M=(,50)'    set right margin to column 50
+     EP'M=(,.)'     set right margin to current Dot position
+     EP'$S=300000'  set space for any new frame to 300000 characters
+     EP'$O=(w,i,n)' set W,I,N options as global defaults
+
+>>>>>>>>>>>>>>>>
+
+
+USING FILES
+
+ the "F" displays the following:
+
+<<<<<<<<<<<<<<
+
+  Commands beginning with F pertain to files.  A frame may have one input
+  file, and one output file.
+
+  Commands beginning with FG pertain to Global Files.
+  Global files are not attached to frames.  (See help entry FG)
+
+   FB     File Back           Rewinds the input file of the current frame
+   FE     File Edit           Opens input and output files for current frame
+   FI     File Input          Opens input file for current frame (- to close)
+   FK     File Kill           Closes and deletes an output file
+   FO     File Output         Opens output file for current frame (- to close)
+   FP     File Page           Writes to the output file, reads from input file
+   FS     File Save           Saves contents of current frame
+   FT     File Table          Displays a table of currently open files
+   FX     File Execute        Read file into frame COMMAND, compile & execute
+>>>>>>>>>>>>>
+
+On opening Ludwig, the initial environment is in Frame LUDWIG, and the <input-file> and <output-file>
+attachments are determined by the command line specifications on entry.
+
+When new Frames are created (by \ED), file attachments must be explicitly made, by commands
+File Input (FI) and File Output (FO). Some other file commands of special interest are:
+
+FK is useful when we have opened an output file, and later wished we had opened it read-only, after
+making unfortunate edits.
+
+FT gives useful confirmation of the state of the current file attachments
+
+FX is used when the file is in fact a Ludwig COMMAND PROCEDURE.
+
+
+Globally Accessible Files
+
+Ludwig may have one Global Input file, and one Global Output file. Input may be read into any frame,
+and  output written from any frame.
+
+   FGB    Global File Back    Rewinds the global input file
+   FGI    Global Input File   Opens the global input file  (- to close)
+   FGK    Global File Kill    Closes and deletes the global output file
+   FGO    Global Output File  Opens the global output file (- to close)
+   FGR    File Read           Reads n lines from the global input file
+   FGW    File Write          Writes n lines to the global output file
+
+Example 1
+
+        ED 'new_frame'  ! make a new Frame
+        FX 'file1'      ! open "file1" and read it
+       -FI              ! close the input file
+        WE              ! put Dot at the end of the frame
+        FGI'file2'      ! open "file2" as a Global Input File
+      9 FGR             ! read 9 lines from "file2" and append to end of Frame "new_frame"
+
+Example 2
+
+        ER 'eric'       ! make a new Frame called "eric"
+        FE 'new'        ! open Input and Output files called "eric"
+
+Files attached to Frames are read and written in their entirety.
+Global files are not attached to Frames, but are accessible from every Frame,
+and parts of global files can be read and written.
+
+ELEMENTARY TEXT PROCESSING
+
+A "word" is a continuous sequence of non-blank characters on the same line
+
+        AW      moves to the beginning of the next word
+       nAW      moves to the beginning of the next nth word
+       0AW      moves to the beginning of the current word
+       >AW      moves to the beginning of the next paragraph
+       <AW      moves to the beginning of the current paragraph
+
+where a paragraph is a contiguous block of non-blank lines.
+
+        AP      moves to the beginning of the next paragraph
+        DP      Deletes all the lines in the paragraph
+
+Note: The help entry for AW shows:
+
+        LEADING PARAMETER: [none, + , - , +n , -n , > , < ,   ] AW
+
+      Where a leading parameter of a command shows "<" and ">" applicable, typing "," and "." has the same effect
+
+
+TEXT FORMATTING
+
+Commands beginning with TF are the text formatting commands. These commands are used to construct Command
+Procedures, or may be used in sequence, to format text according to normal text layout conventions.
+
+   TFC    Centre Line         Centres line between margins
+   TFF    Word Fill           Places as many words as possible on a line
+   TFJ    Line Justify        Expands line to fit exactly between margins
+   TFL    Align Left          Places start of line at left margin
+   TFR    Align Right         Places end of line at right margin
+   TFS    Word Squeeze        Removes extra spaces from line
+
+TEST ON LOCATION OF DOT/CURSOR
+
+Commands beginning with EO are used in Command Procedures to test whether Dot is at the END OF a
+construct.
+
+   EOL    End Of Line         Tests for end of line
+   EOP    End Of Page         Tests for end of page
+   EOF    End Of File         Tests for end of file
+
+Commands beginning with EQ are used in Command Procedures to test whether Dot is at a particular place,
+or at a particular piece of text.
+
+   EQC    Equal Column        Tests for column position of Dot
+   EQM    Equal Mark          Tests for position of mark n
+   EQS    Equal String        String match at Dot
+
+MOVING DOT/CURSOR
+
+Commands beginning with A pertain to moving dot.
+
+   AC     Advance Character   Advances one character to the right.
+   AL     Advance Line        Advances to the start of the next line.
+   AO     Advance Over        Advances to the next character not in the set.
+   AT     Advance To          Advances to the next character in the set.
+   AW     Advance Word        Advances to the start of the next word.
+
+AT and AO take a set of characters as their argument
+
+nAT       searches for the nth occurrence of any of a set of specified characters.
+          The command fails if there are less than n occurrences remaining in the frame.
+          Exact case matching is used.
+
+  EXAMPLES:
+
+     AT'a'    search for the first occurrence of the character "a" forwards
+    -AT'a'    search for the first occurrence of the character "a" backwards
+    9AT'a'    search for the ninth occurrence of the character "a" forwards
+     AT'abc'  search for the first occurrence of any of "a", "b" or "c"
+     AT'a..z' search for the first occurrence of any lower case alphabetic
+
+Advance Over AO
+
+     AO'a'    skip occurrences of the character "a" to the right
+    -AO'a'    skip occurrences of the character "a" to the left
+     AO'abc'  skip occurrences of any of "a", "b" or "c"
+     AO'aBc'  skip occurrences of any of "a", "B" or "c"
+     AO'a..z' skip occurrences of any lower case alphabetic character
+     AO'0..9' skip occurrences of any numeric string
+
+
+ARGUMENT DELIMITERS
+
+For commands which require a string (of characters) as an argument, any balanced pair of non-alphanumeric
+characters will serve as delimiters. For example with the Get command G, these are valid:
+
+        g'cat'
+        g/cat/
+        g.cat.
+
+Some characters have special meaning when used as delimiters.
+
+        "       indicates exact case matching
+
+        &       the enclosed string is to be used as a prompt for interactive argument entry,
+                and the reply to the prompt is used as the string argument.
+
+
+        ?       the enclosed string is taken to be a Ludwig-defined variable, and is replaced
+                by the value of that variable. Recognised variables are:
+
+                        terminal-name   terminal-height terminal-width  terminal-speed
+                        frame-name      frame-input-file   frame-output-file
+                        frame-modified  ludwig-version  ludwig-command-introducer
+                        ludwig-insert-mode  ludwig-overtype-mode        ludwig-opsys
+                        env-<environment-variable> (Unix)
+
+                eg.  ti?terminal-name?
+                     inserts the name of the terminal in use into the text.
+
+        $       the enclosed string is taken to be the name of a Span or Frame and the contents
+                of the Span or Frame is used as the string
+
+        $$      double dollar delimiter indicates double de-referencing on Span or Frame names
+
+               eg.   g/$name$/
+                     searches for the string which is the contents of the span called NAME,
+
+                     g/$$name$$/
+                     dereferences the span name twice.
+                     i.e. The contents of span called NAME is used as the name of the span
+                     in which the target string is located.
+
+        `       back-quote indicates a pattern matching specification - See section PATTERN MATCHING
+
+HINT:   See HELP topic 4    TRAILING PARAMETERS and order of evaluation.
+
+
+LEADING PARAMETERS
+
+The Help facility provides information on which Leading Parameters apply to the command in question. eg
+the Delete Character command DC:
+
+                LEADING PARAMETER: [none, + , - , +n , -n , > , < , @ ] DC
+
+specifies that it can be used without a leading parameter (none) delete to the right or left by one or n
+characters.  The parameter "@" will delete all characters between the current character and where a mark
+has been placed previously. Where "@" can be used another leading parameter "=" can be used; it signifies
+the previous position of Dot, so \=DC will delete all characters to the previous position of Dot.
+
+
+LUDWIG COMMAND PROCEDURES
+
+Ludwig commands may be composed to form a COMMAND PROCEDURE, the simplest form being a sequence of
+commands. The command Text eXecute TX prompts for a procedure:
+
+\TX     Command:  CL 2AL
+
+will insert a blank line above the current line, then move to the line below the current line.
+
+A variation on TX is the command \( and further typing is regarded as a command procedure, terminated by
+the character ")", equivalent to a RETURN after TX, but the typing is not echoed to the screen.
+
+In both cases, the command procedure is held in Frame "COMMAND", where it is compile and executed.
+If there are syntax errors, the Frame "COMMAND" is displayed, with the syntax error discovered by the
+parser is indicated by the character "!". The Frame "COMMAND" may be edited to correct the error, and
+re-compiled and executed. The character "!" on a line of its own is treated by the parser as a comment,
+and need not be removed.
+
+Recall that CNTRL/G executes the contents of the Frame COMMAND, so is useful for
+repetition. So after entering the command procedure above, CNTRL/G will work its way down the text,
+line at a time, inserting a blank line before each original line.
+
+Iteration is available by enclosing a command procedure in parentheses with a repeat count  - an integer
+or the indefinite repeat ">"
+
+\TX     Command:  >( CL 2AL)
+
+will repeat to <end_of_frame>
+
+More complex procedures can be composed in a Span, or in a file to be read into a Span or Frame,
+including the use of an <initialisation-file> on the system command line, or in the file .ludwigrc
+
+Command Procedures can be nested, indefinitely. Syntax:
+
+CMD_PROC ::= CMD | CMD CMD_PROC | NUMBER "(" CMD_PROC ")" | ">" "(" CMD_PROC ")"
+
+The command Span eXecute SX executes the contents of a span as a Command Procedure. If the procedure has
+syntax errors, it will not be executed, and the procedure will be displayed in its frame, with error
+messages as described above.
+
+The command Span Execute SE executes the compiled code for a span; if there is no compiled code for the
+span, the span is compiled first. Thus a span may be modified, or even deleted, yet its old compiled code
+is retained and executed.
+
+The command Span Recompile SR recompiles a span for execution. The Span Execute command SX automatically
+recompiles its span before executing it; the Execute Norecompile command SE does not do so if compiled
+code for the span exists.
+
+The Execute command SX is equivalent to SR followed by SE.
+
+
+
+
+CONTROL FLOW
+
+
+As a programming language, as described so far, Ludwig has sequential composition and recursive
+iteration, but no conditional execution such as If ... Then ... Else...   and   While ... Do ...
+
+An alternative control mechanism is provided based on the property that all commands result in SUCCESS,
+FAILURE or ABORT, and an EXIT HANDLING method is provided as a flow control mechanism.
+
+Default Exit Handling
+
+On a successful execution of a command, control is passed to the next command, with SUCCESS set.
+
+In interactive mode, success will wait for the next command from the keyboard. If fail, the terminal bell
+rings and control return to the keyboard.
+
+In command procedures, on success, the next command will be executed. If there is no next command, the command
+procedure will have executed with success. If a command fails, then the command procedure fails, and
+control returns to the next level up which may be the keyboard, or the next level of command procedure
+nesting. Similarly, on failure, control is passed to the next nesting level up, with FAILURE set.
+
+User Specified Exit Handling
+
+Commands, or command procedures may have an EXIT HANDLER, syntax:
+
+        <command> "[" <success-actions> ":" <failure-actions> "]"
+
+<success-actions> and <failure-actions> are any Ludwig commands or procedures. The Success branch and the
+Failure branch are optional, If only one is specified, it is taken to be the Success branch. If only one
+is specified, preceded by ":" it is a Failure branch.
+
+Example:        A two level procedure     <AC >( EOL TI'Blank Line' AL )
+
+                Dot is forced to the beginning of the current line
+                Then test for End of Line, and if it is, then the line is empty,
+                so enter text 'Blank Line' and advance to the next line and the iteration continues.
+                But if EOL fails because the line is not empty, the Failure will cause control to exit to
+                the next level with FAILURE set, so exits there too.
+
+                A modified  procedure     <AC >( EOL [TI'Blank Line'] AL )
+
+                Here on EOL success, the success exit handler invokes the text insertion, but
+                because the failure exit handler has "no action", which does not fail.
+                In both cases, AL is executed, and the iteration continues,
+
+   XS     Exit success        Command Procedure exit with success
+   XF     Exit Failure        Command Procedure exit with failure
+   XA     Exit Abort          Aborts Command Procedure
+
+  XS Transfers control out of a Command Procedure by the specified number of
+  nesting levels; "nesting level" is textual, based on a count of parentheses
+  only, not dynamic.  Usually used in exit handlers (see Command Procedures).
+  It signals success on return.
+
+  EXAMPLE:
+  -------
+     >( 5( AC[:2XF] ) AL[:XS] )  TO/*****/
+
+     Failure of the command AL causes execution of its fail handler, which
+     in this case is the command XS.  Control transfers out by one level,
+     i.e.  out of the outermost loop.  Because XS sets the execution status
+     to "success", TO/*****/ is executed.
+
+     Failure of the command AC causes execution of its fail handler, which
+     in this case is the command 2XF.  Control transfers out by two levels,
+     i.e. out of both loops.  Because XF signals a failure on exit from the
+     loop, the entire procedure fails at that point so TO/*****/ is not
+     executed.
+
+XA Aborts all Command Procedure execution, no matter how deeply nested
+  (textually or dynamically), and returns control to interactive keyboard
+  entry; signals failure on return.
+
+THE COMPILER
+
+Span Execute (SE) executes the compiled code for a span; if there is no compiled code for the span, the
+span is compiled first. Thus a span may be modified, or even deleted, yet its old code retained and
+executed. Compilation can be forced by the Span Recompile command SR. The Execute command SX is
+equivalent to SR followed by SE.CJB see compiler p 53 and exit handlers
+
+Command procedures may (recursively) define further command procedures, by composing strings for naming as
+spans and compiling for execution, or by composing pre-defined procedures. It may be convenient to
+structure such specifications in two parts, an initialisation part and a part specifying a set of
+additional procedures. If the initialisation part compiles the additional procedures, it is necessary to
+stop the compiler at the end of the initialisation part to avoid the additional procedures being compiled
+twice. this is done by inserting the "stop compile" marker "<>" at that point.
+
+
+PATTERN MATCHING
+
+In simple text matching, the commands G (Get) R Replace) and EQS (Equal String) specify a character
+string as the target for the search/match. For more complex matching, Ludwig provides a pattern matcher
+which uses a regular expression language to describe the structure of the target pattern.
+
+Pattern specifications are indicated by the back-quote eg:
+
+        G`< pattern-specification>`
+and     R/`<pattern-specification>`/<replacement-text>/
+
+Pattern specification elements include Strings, Sets, Marks and Positionals, which are composed in the
+language of regular expressions.
+
+Strings:
+
+Character strings are delimited with either single or double quotes. Double quotes are used to indicate
+exact case matching, whilst single quotes indicate inexact case matching. Dereferencing is allowed within
+strings if the string contains only a dereference. ie.
+
+            '$fred$' will use the contents of span fred as a quoted string.
+
+            '&String : &' will prompt "String : ", and the input treated as a quoted string with inexact
+             case match
+
+            (both of the above work with ", in which case exact case matching is used).
+
+            To get the string $fred$ use '$''fred$', so $ is not both the first and last char of the
+            string.
+
+Predefined SETS are
+
+            A : Alphabetic characters.
+            U : Uppercase alphabetic.
+            L : Lowercase alphabetic.
+            P : Punctuation characters.  (),.;:"'!?-`  only
+            N : Numeric characters.
+            S : The space.  (non-space is therefore -S)
+            C : All printable characters.
+            D : Define.  To define a set.
+
+              D <delimiter> { {char} | {char .. char} } <delimiter>
+                   (the syntax is identical to NEXT and BRIDGE)
+              EG.  D/a..z/ is the same as L
+                   D/a..zA..Z$_0..9/ are all the printable characters
+
+Marks       Mark @n, where n is a mark number, is used in a pattern to test for a mark at the present position.
+
+Positionals.
+
+            < > are respectively the beginning and end of lines.
+            { } the left and right margins.
+             ^  the column that the Dot was in when the match started.
+Examples
+            <'program'  will find the string 'program only if it start in column one.
+            ^'end'      will find "end' only if it starts in the column Dot was in.
+                        This is useful for working with program text that uses indentation to indicate
+                        nesting.
+Other Positionals
+
+             @n         is on of the marks 1 .. 9
+             =          Special mark Equals, being the previous position of Dot
+             %          is the Modified mark
+
+Range Specifiers
+
+In place of a repeat count, a range may be specified.
+
+            [ <from> , <to> ]
+eg
+            [2,4] (+S +A)       will match between two and four words.
+
+            [ , ]               same as the Kleene Star *
+            [1 , ]              same as the Kleene Plus +
+            [ 2 , 2]            same as a repeat count of 2
+
+
+
+Dereferenced Patterns.
+
+            A pattern definition may be obtained using standard Ludwig dereferencing mechanisms.
+
+            Note : 1. Dereferenced spans are pattern definitions NOT strings, therefore if a string is
+                      desired use string dereferencing as described above.
+
+                   2. Dereferenced spans are Context free patterns and therefore may not contain context
+                      changes (commas).
+
+Example Patterns:
+
+        G`SUL`          A space followed by an upper case letter then a lower case letter
+        G`SULLLLS`      A space and uppercase letter four lower case letters and a space
+        G`SU4LS`        Same as above
+        G`SU*LS`        Space, uppercase letter, one or more lower case letters and a space
+        G`S+LS`         Same as above
+        G`4(S+L)S`      Four words separated by a space
+         `-A`           a non alphabetic character; negation only applies to a single character class,
+                          not compounds such as in `-(AN)` which is illegal.
+         `+(-S)`        one or more non-spaces
+
+The alternate operator "|"
+
+        `"hello"|"goodbye"`     matches hello or goodbye
+
+If the alternates are complex patterns, they should be enclosed in parentheses.
+eg
+        `('procedure' *S '('  ) | (function' *S '('  )`
+will match
+           procedure(          or  function(
+
+PATTERN CONTEXT
+
+Consider a pattern to find a word being a contiguous string of alphabetic characters bounded by a space
+viz.
+       G `S+AS`  will match a word, but include spaces in the match between the marks Dot and Equals.
+
+After a successful search using G, Dot is at the character after the matched string, and the Equals mark (=) is
+the first character of the string. The position of Patterns may be specified in context: Dot and Equals
+are reversed after a backward search.
+
+Patterns may be specified in context.
+
+        <left-context>, <target>, <right-context>
+
+where each <...> is a pattern specification.
+
+        G `S,+A,S` will match the word between Dot and Equals, but not the surrounding spaces.
+
+
+
+UNIX COMMAND LINE OPTIONS
+
+As explained at the beginning, the ludwig invocation command line has the following syntax:
+
+        ludwig [editor parameters and options] [<input file-name>] [output file-name>]
+
+Editor parameters were discussed earlier, as being specified in the command line or interactively by the
+Edit Parameters command EP. Edit parameters are about text and formatting.
+
+There can also be zero or more command line OPTIONS, which concern the editing session.
+
+-b value        Default value is  -b 1
+                "value" determines the number of backup copies of the output file is kept.
+                A file named "eric" will have a backup version named eric~1, the next eric~2 and so on.
+                If the number of backup files will exceed "value", then the oldest backup is deleted.
+
+-B value
+
+
+-c              Create an output file, checking that it does not already exist.
+
+-r              Read-only. Do not open an output file.
+
+-i file         Default is -i  ~/.ludwigrc
+                Specifies an initialisation file to be executed, with FX, after the default Frame LUDWIG
+                has been loaded, and after the file ~/.ludwigrc has been executed.
+
+-I              No initialisation file is executed.
+
+-s value        Default is  -s 500000
+                The number of characters of text allowed in the default Frame.
+
+-o              The old command language is used.
+
+-O              The new command language (V4.9, v5) is used,
+
+-m file         Default is -n  ~/.lud_memory
+                Use the first line in the named file as the name of the file to edit.
+                Ludwig will update this file with the path of the current output file.
+
+-M              Do not use or set the Ludwig filename memory.
+
+-t              Entab all output files.
+
+-T              Disable entabbing of output files.
+
+-u              Display a brief usage message as a reminder of the various options available.
+
+usage : ludwig [-c] [-r] [-i value] [-I] [-s value] [-m file] [-M] [-t] [-T] [-b value] [-B value] [-o]
+[-O] [-u] [file [file]]
+
+
+
+COMMAND NAMES
+
+Commands in the old language are mapped to the new language as follows -
+
+        Old     New             Old     New             Old     New
+
+        A       AL              SW      TS              ZC      KC
+        BR      AO              UK      KM              ZD      KD
+        C       CC              UP      OP              ZH      KH
+        D       DC              US      OS              ZL      KL
+        EN      SE              WM      WC              ZR      KR
+        EX      SX              WS      WM              ZT      KT
+        I       KI and TI       YA      AW              ZU      KU
+        J       AC              YC      TFC             ZZ      KX
+        K       DL              YD      DW              *E      TCE
+        L       CL              YF      TFF             *L      TCL
+        N       AT              YJ      TFJ             *U      TCU
+        O       KO and TO       YL      TFL             ^       TX
+        SI      ST              YR      TFR             ?       TN
+        SL      TB              YS      TFS
+        ST      SM              ZB      KB
+
+
+Additional commands in new command language:
+
+        PC      Position in Column
+        PL      Position in Line
+        OX      Operating system Command
+        AP      Advance Paragraph
+        DP      Delete Paragraph
+
+
+COMPLETE COMMAND SUMMARY - New commands.
+
+Help Topic 3 - \H enter RETURN for all Topics, or 3 for Topic 3.
+
+3. Complete Command Summary
+  ===========================
+Symbol  Name                Action
+----------------------------------------------------------------------------
+ AC     Advance Character   Moves Dot left or right n characters
+ AL     Advance Line        Moves forward or backward n lines
+ AO     Advance Over        Bridges any of a set of characters
+ AT     Advance To          Get nth occurrence of any of a set of characters
+ AW     Advance Word        Advances n words
+ CC     Create Character    Inserts n spaces before Dot
+ CL     Create Line         Inserts n blank lines above Dot
+ DC     Delete Character    Deletes n characters
+ DL     Delete Line         Deletes n lines
+ DW     Delete Word         Deletes n words
+ ED     Edit frame          Changes frames, possibly creating a new one
+ EK     Kill Edit frame     Destroys a frame and its attributes
+ EOL    End Of Line         Tests for end of line
+ EOP    End Of Page         Tests for end of page
+ EOF    End Of File         Tests for end of file
+ EP     Edit Parameters     Shows editor parameters, e.g. margins, options
+ EQC    Equal Column        Tests for column position of Dot
+ EQM    Equal Mark          Tests for position of mark n
+ EQS    Equal String        String match at Dot
+ ER     Edit Return         Returns to frame which called current frame
+ FB     File Back           Rewinds the input file of the current frame
+ FE     File Edit           Opens input and output files for current frame
+ FGB    Global File Back    Rewinds the global input file
+ FGI    Global Input File   Opens the global input file (- to close)
+ FGK    Global File Kill    Closes and deletes the global output file
+ FGO    Global Output File  Opens the global output file (- to close)
+ FGR    Global File Read    Reads n lines from the global input file
+ FGW    Global File Write   Writes n lines to the global output file
+ FI     File Input          Opens input file for current frame (- to close)
+ FK     File Kill           Closes and deletes an output file
+ FO     File Output         Opens output file for current frame (- to close)
+ FP     File Page           Writes to the output file, reads from input file
+ FS     File Save           Saves contents of current frame
+ FT     File Table          Displays a table of currently open files
+ FX     File Execute        Read file into frame COMMAND, compile & execute
+ G      Get                 Gets the nth occurrence of a string
+ H      Help                Displays help on a command or topic
+ KB     Backtab             Same as <BACKTAB> key
+ KC     Carriage Return     Same as <RETURN> key
+ KD     Keyboard Down       Same as down arrow key
+ KH     Keyboard Home       Same as <HOME> key
+ KI     Keyboard Insert     Insert option--typed text is inserted
+ KL     Keyboard Left       Same as left arrow key
+ KM     Keyboard Mapping    Maps a command string onto a keyboard key
+ KO     Keyboard Overtype   Overtype mode--typed text overwrites existing
+ KR     Keyboard Right      Same as right arrow key
+ KT     Tab                 Same as <TAB> key
+ KU     Keyboard Up         Same as up arrow key
+ KX     Delete              Same as <DELETE> key
+ M      Mark                Defines a mark; nM defines mark 1..9
+ OP     Op. Sys. Parent     Attaches the terminal to the parent process
+ OS     Op. Sys. Subprocess Attaches the terminal to a subprocess
+ OX     Op. Sys. Execute    Executes an operating system command.
+ PC     Position Column     Position dot relative to column 1
+ PL     Position Line       Position dot relative to line 1
+ Q      Quit                Exits from editor
+ R      Replace             Replaces one string with another
+ SA     Span Assign         Assigns text to a span
+ SC     Span Copy           Copies a previously defined span
+ SD     Span Define         Defines and names a span
+ SE     Span Re-execute     Executes commands in a span; no recompilation
+ SJ     Span Jump           Jumps to the beginning or end of a span
+ SM     Span Move           Moves a previously defined span (not a copy)
+ SR     Span Recompile      Recompiles a span
+ ST     Span Table          Lists all spans and frames
+ SX     Span Execute        Compiles and executes commands in a span
+ TB     Text Break          Splits a line in two
+ TCE    Text Case Edit      Changes case to editcase
+ TCL    Text Case Lower     Changes case to lowercase
+ TCU    Text Case Upper     Changes case to uppercase
+ TFC    Text Format Centre  Centres line between margins
+ TFF    Text Format Fill    Places as many words as possible on a line
+ TFJ    Text Format Justify Expands line to fit exactly between margins
+ TFL    Text Format Left    Places start of line at left margin
+ TFR    Text Format Right   Places end of line at right margin
+ TFS    Text Format Squeeze Removes extra spaces from line
+ TI     Text Insert         Insert text into line
+ TO     Text Overtype       Overtype text into line
+ TS     Text Swap           Swaps a pair of lines
+ TX     Text Execute        Prompts for and executes a Command Procedure
+ UC     Command Introducer  Types the command introducer into the text
+ V      Verify              Command Procedure interactive verify
+ WB     Window Back         Moves the window back over the frame
+ WC     Window Centre       Centres the window on Dot
+ WE     Window End          Moves the window to the end of the frame
+ WF     Window Forward      Moves the  window forward over the frame
+ WH     Window Height       Sets the height of the window
+ WL     Window Left         Shifts the window left
+ WM     Window Move         Enables scrolling with arrow keys
+ WN     New Window          Redisplays the current window
+ WR     Window Right        Shifts the window right
+ WT     Window Top          Moves the window to the top of the frame
+ WU     Window Update       Updates the window without a full re-draw
+ XA     Exit Abort          Aborts Command Procedure
+ XS     Exit success        Command Procedure exit with success
+ XF     Exit Failure        Command Procedure exit with failure
+  (      Direct Entry        An unprompted version of Execute String
+ "      Ditto               Copies characters from line above
+ '      Ditto from below    Copies characters from line below
+ {      Left Margin         Resets the left margin
+ }      Right Margin        Resets the right margin
+ ?      Invisible Insert    Insert characters invisibly
+                  -------------------
