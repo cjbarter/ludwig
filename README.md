@@ -1,16 +1,6 @@
-```
-{**********************************************************************}
-{                                                                      }
-{            L      U   U   DDDD   W      W  IIIII   GGGG              }
-{            L      U   U   D   D   W    W     I    G                  }
-{            L      U   U   D   D   W ww W     I    G   GG             }
-{            L      U   U   D   D    W  W      I    G    G             }
-{            LLLLL   UUU    DDDD     W  W    IIIII   GGGG              }
-{                                                                      }
-{**********************************************************************}
-```
-
 # ABOUT
+
+Efficient, and powerful text editor, with command programming language.
 
 Ludwig is a text editor developed at the University of Adelaide. 
 It is an interactive, screen-oriented text editor.
