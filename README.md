@@ -1,4 +1,4 @@
-# ABOUT
+# About
 
 Efficient, and powerful text editor, with command programming language.
 
