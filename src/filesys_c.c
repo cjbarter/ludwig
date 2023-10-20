@@ -156,6 +156,8 @@
 #define FILE_NAME_LEN   60
 #endif
 
+#define FILESYS_SHORT_STRING_LENGTH (100)
+
 static STR_OBJECT msg_string;
 char *index(),*rindex();
 extern int errno;
@@ -165,10 +167,11 @@ extern int errno;
 #else
 # ifdef linux
 # define screen_message _screen_unix_message
+extern void screen_message();
 # else
 # define screen_message screen_unix_message
-# endif
 extern void screen_message() __attribute__ ((stdcall));
+# endif
 #endif
 
 static int filesys_expand_file_name();
@@ -183,6 +186,31 @@ temporary_file_too_long(const char *fnm) {
 }
 
 /*----------------------------------------------------------------------------*/
+
+/*
+ * @brief take a long string and shrink to requested length
+ *
+ * @param dest
+ * @param src
+ * @param buff_len size of destination and requested length
+ *
+ * simple test in ../tests directory - fs.c
+ */
+void filesys_compress_string(char * dest, char * src, int buff_len) {
+  char * l_dest = dest;
+
+  if (strlen(src) > FILESYS_SHORT_STRING_LENGTH) {
+      // truncate the string
+      int short_offset = FILESYS_SHORT_STRING_LENGTH/3;
+      l_dest = stpncpy(l_dest, src, short_offset);
+      l_dest = stpcpy(l_dest, "...");
+      char * src_tail = src + (strlen(src) - short_offset);
+      strncpy(l_dest, src_tail, short_offset);
+  } else {
+     // just copy to dest
+     strcpy(l_dest, src);
+  }
+}
 
 /*
 function filesys_create_open {(
@@ -431,7 +459,9 @@ BOOLEAN msgs;
 
 {
     char   *s,dir[FILE_NAME_LEN],bname[FILE_NAME_LEN];
-    char   spec[FILE_NAME_LEN],temp[FILE_NAME_LEN];
+    /* spec is used to hold the full path - comprised of dir and temp or bname */
+    char   spec[FILE_NAME_LEN + FILE_NAME_LEN + 3];
+    char   temp[FILE_NAME_LEN];
     struct stat stat_buffer;
     int    pstat;
     DIR    *dirp;
@@ -561,8 +591,12 @@ BOOLEAN msgs;
     /* now rename the temp file to the real thing */
     chmod(fyle->tnm, fyle->mode & 07777);
     if (rename(fyle->tnm, fyle->fnm)) {
+        char tnm[FILESYS_SHORT_STRING_LENGTH] = {0};
+        char fnm[FILESYS_SHORT_STRING_LENGTH] = {0};
+        filesys_compress_string(&tnm[0], fyle->tnm, FILESYS_SHORT_STRING_LENGTH);
+        filesys_compress_string(&fnm[0], fyle->fnm, FILESYS_SHORT_STRING_LENGTH);
         snprintf(msg_string, sizeof(msg_string), "Cannot rename %s to %s\n",
-                 fyle->tnm, fyle->fnm);
+                 tnm, fnm);
         screen_message(msg_string);
         return 0;          /* fail,    return false */
     } else {
