@@ -36,10 +36,10 @@
 ! $Header: /home/medusa/projects/ludwig/current/RCS/type.h.unix,v 4.6 90/07/11 11:24:19 ludwig Exp $
 ! $Author: ludwig $
 ! $Locker:  $
-! $Log:	type.h.unix,v $
+! $Log: type.h.unix,v $
 ! Revision 4.6  90/07/11  11:24:19  ludwig
 ! Change test for ultrix to test for vax.  KBN
-! 
+!
 ! Revision 4.5  90/02/18  16:54:08  ludwig
 ! get the padding right in the key_name_record for a sparc running X
 !
@@ -170,8 +170,8 @@
  */
 
 typedef enum { PARSE_COMMAND, PARSE_INPUT, PARSE_OUTPUT,
-	       PARSE_EDIT, PARSE_STDIN, PARSE_EXECUTE
-	} PARSE_TYPE;
+               PARSE_EDIT, PARSE_STDIN, PARSE_EXECUTE
+        } PARSE_TYPE;
 
 #define LINE_RANGE      UINT4   /* 0..max_lines    */
 #define LINE_RANGE_f    UINT4_f /* 0..max_lines    */
@@ -210,19 +210,19 @@ typedef char FILE_NAME_STR[FILE_NAME_LEN];
 
 typedef char KEY_NAME_STR[KEY_NAME_LEN];
 typedef struct {
-	KEY_NAME_STR     key_name;
-	KEY_CODE_RANGE_f key_code;
+        KEY_NAME_STR     key_name;
+        KEY_CODE_RANGE_f key_code;
 #if vax || mc68000
-	char             dummy;
+        char             dummy;
 #endif
 #ifdef sparc
 #ifdef XWINDOWS
-	char             d1, d2;
+        char             d1, d2;
 #else
-	char             d1,d2,d3;
+        char             d1,d2,d3;
 #endif
 #endif
-	} KEY_NAME_RECORD;
+        } KEY_NAME_RECORD;
 
 #ifndef XWINDOWS
   /* don't need parse table for xwindows */
@@ -230,10 +230,10 @@ typedef struct {
 #define PARSE_TABLE_INDEX       UINT2   /* 0..max_parse_table */
 #define PARSE_TABLE_INDEX_f     UINT2_f /* 0..max_parse_table */
 typedef struct {
-	CHAR_f              ch;
-	KEY_CODE_RANGE_f    key_code;
-	PARSE_TABLE_INDEX_f index;
-	} PARSE_TABLE_RECORD;
+        CHAR_f              ch;
+        KEY_CODE_RANGE_f    key_code;
+        PARSE_TABLE_INDEX_f index;
+        } PARSE_TABLE_RECORD;
 #endif /* not XWINDOWS */
 
 /* Objects */
