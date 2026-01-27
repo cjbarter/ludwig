@@ -99,13 +99,14 @@ endif
 # use gcc
 CC = gcc -Wall
 
+MACOS_VER=-mmacos-version-min=11.0
 ifdef NDEBUG
-CFLAGS  = $(WINDOWING) -O -Dfpc -DMACOS -DTIME_T_SIZE=8
+CFLAGS  = $(WINDOWING) -O -Dfpc -DMACOS -DTIME_T_SIZE=8 $(MACOS_VER)
 else
-CFLAGS  = $(WINDOWING) -DDEBUG -Dfpc -DMACOS -DTIME_T_SIZE=8 -g
+CFLAGS  = $(WINDOWING) -DDEBUG -Dfpc -DMACOS -DTIME_T_SIZE=8 -g $(MACOS_VER)
 endif
 
-LDFLAGS = -Fl/usr/local/lib
+LDFLAGS = -Fl/usr/local/lib -Fl/opt/homebrew/opt/ncurses/lib
 LIBES =
 
 # where the sources are kept

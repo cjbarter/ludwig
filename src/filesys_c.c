@@ -143,6 +143,7 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/dir.h>
@@ -159,22 +160,20 @@
 #define FILESYS_SHORT_STRING_LENGTH (100)
 
 static STR_OBJECT msg_string;
-char *index(),*rindex();
 extern int errno;
 
 #ifdef TEST
-#define screen_message(string) fprintf(stderr,"%s\n",string)
+# define screen_message(string) fprintf(stderr,"%s\n",string)
 #else
 # ifdef linux
-# define screen_message _screen_unix_message
-extern void screen_message();
+#  define screen_message _screen_unix_message
 # else
-# define screen_message screen_unix_message
-extern void screen_message() __attribute__ ((stdcall));
+#  define screen_message screen_unix_message
 # endif
+extern void screen_message(const char *msg);
 #endif
 
-static int filesys_expand_file_name();
+static int filesys_expand_file_name(char *fnm, int *fns);
 
 /*----------------------------------------------------------------------------*/
 
@@ -224,10 +223,7 @@ function filesys_create_open {(
 
 */
 BOOLEAN
-filesys_create_open(fyle,rfyle,ordinary_open)
-FILE_PTR fyle,rfyle;
-BOOLEAN  ordinary_open;
-
+filesys_create_open(FILE_PTR fyle, FILE_PTR rfyle, BOOLEAN ordinary_open)
 {
     char   related[FILE_NAME_LEN+1];
     char   *p;
@@ -381,10 +377,7 @@ BOOLEAN  ordinary_open;
 /*----------------------------------------------------------------------------*/
 
 static int
-filesys_write_file_name(mem, fnm, fns)
-char *mem;
-char *fnm;
-int  fns;
+filesys_write_file_name(char *mem, char *fnm, int fns)
 {
     int envfd;
 
@@ -402,10 +395,7 @@ int  fns;
 /*----------------------------------------------------------------------------*/
 
 static int
-filesys_read_file_name(mem, fnm, fns)
-char *mem;
-char *fnm;
-int  *fns;
+filesys_read_file_name(char *mem, char *fnm, int *fns)
 {
     int envfd;
     int read_len;
@@ -441,11 +431,7 @@ function filesys_close {(
 
 */
 BOOLEAN
-filesys_close(fyle, action, msgs)
-FILE_PTR fyle;
-int action;
-BOOLEAN msgs;
-
+filesys_close(FILE_PTR fyle, int action, BOOLEAN msgs)
 /* Closes a file, described by fileptr fyle.
  * Action is an integer interpreted as follows:
  *   0 : close
@@ -455,8 +441,6 @@ BOOLEAN msgs;
  * is going on.
  * Returns true (1) on success, false (0) on failure.
  */
-
-
 {
     char   *s,dir[FILE_NAME_LEN],bname[FILE_NAME_LEN];
     /* spec is used to hold the full path - comprised of dir and temp or bname */
@@ -632,16 +616,11 @@ function filesys_read {(
 
 */
 BOOLEAN
-filesys_read(fyle, output_buffer, outlen)
-FILE_PTR          fyle;
-register char     *output_buffer;
-STRLEN_RANGE      *outlen;
-
+filesys_read(FILE_PTR fyle, char *output_buffer, STRLEN_RANGE *outlen)
 /* Attempts to read MAX_STRLEN characters into buffer.
  * Number of characters read is returned in outlen.
  * Returns true (1) on success, false (0) on failure.
  */
-
 {
     register int ch;
 
@@ -694,13 +673,10 @@ function filesys_rewind {(
 
 */
 BOOLEAN
-filesys_rewind(fyle)
-FILE_PTR fyle;
-
+filesys_rewind(FILE_PTR fyle)
 /*
  * Rewinds file described by the FILE_PTR `fyle'.
  */
-
 {
     fflush(stdout);
     if (lseek(fyle->fd, 0, L_SET) < 0)
@@ -726,15 +702,10 @@ function filesys_write {(
 
 */
 BOOLEAN
-filesys_write(fyle, buffer, bufsiz)
-FILE_PTR     fyle;
-char         *buffer;
-STRLEN_RANGE bufsiz;
-
+filesys_write(FILE_PTR fyle, char *buffer, STRLEN_RANGE bufsiz)
 /* Attempts to write bufsiz characters from buffer to the file described by
  * fyle. Returns true (1) on success, false (0) on failure.
  */
-
 {
     static char nl = '\n';
     int  i,tabs,offset,count;
@@ -773,12 +744,8 @@ function filesys_save {(
 
 */
 BOOLEAN
-filesys_save(i_fyle, o_fyle, copy_lines)
-FILE_PTR i_fyle, o_fyle;
-int copy_lines;
-
+filesys_save(FILE_PTR i_fyle, FILE_PTR o_fyle, int copy_lines)
 /*  Implements part of the File Save command. */
-
 {
         BOOLEAN input_eof;
         int input_position;
@@ -847,9 +814,7 @@ int copy_lines;
 
 /*----------------------------------------------------------------------------*/
 
-static size_t ch_length(str, len)
-    char *str;
-    size_t len;
+static size_t ch_length(char *str, size_t len)
 {
     while ((len > 0) && (str[len] == ' ')) {
         len -= 1;
@@ -877,13 +842,13 @@ function  filesys_parse {(
 int vdu_process_window_args();
 #endif
 
-int filesys_parse(command_line,parse,file_data,input,output)
-char           *command_line;
-PARSE_TYPE     parse;
-FILE_DATA_TYPE *file_data;
-FILE_PTR       *input,*output;
-
-{
+int filesys_parse(
+    char *command_line,
+    PARSE_TYPE parse,
+    FILE_DATA_TYPE *file_data,
+    FILE_PTR *input,
+    FILE_PTR *output
+) {
     static char usage[]="usage : ludwig [-c] [-r] [-i value] [-I] [-s value]\
  [-m file] [-M] [-t] [-T] [-b value] [-B value] [-o] [-O] [-u] [file [file]]";
     static char file_usage[]="usage : [-m file] [-t] [-T] [-b value] [-B value]\
@@ -894,7 +859,6 @@ FILE_PTR       *input,*output;
     short   purge,entab,files;
     BOOLEAN usage_flag,create_flag,read_only_flag,space_flag,version_flag;
     short   check_input;
-    char    *strtok();
     char    *temp,*argv[255],*initialize,*memory,*file[2];
     char    def_memory[MAX_STRLEN],def_init[MAX_STRLEN];
 
@@ -1182,10 +1146,7 @@ FILE_PTR       *input,*output;
 /*----------------------------------------------------------------------------*/
 
 static int
-filesys_expand_file_name(fnm,fns)
-char *fnm;
-int *fns;
-
+filesys_expand_file_name(char *fnm, int *fns)
 {
     struct passwd *passwd;
     char *s,*p,*q,*tmp,*cwd;

@@ -117,9 +117,7 @@ function helpfile_open {(
   {tower:c_external}
 
 */
-long helpfile_open(old_version)
-BOOLEAN old_version;
-
+long helpfile_open(BOOLEAN old_version)
 {
     long i,j,contents_size;
     char *help,buffer[ENTRY_SIZE+1];
@@ -190,10 +188,7 @@ function helpfile_read {(
   {tower:c_external}
 
 */
-long helpfile_read(keystr,keylen,buffer,buflen,reclen)
-char *keystr,*buffer;
-long keylen,buflen,*reclen;
-
+long helpfile_read(char *keystr, long keylen, char *buffer, long buflen, long *reclen)
 {
     char  buf[ENTRY_SIZE+1];
     ENTRY *result,entry;
@@ -235,10 +230,7 @@ function helpfile_next {(
   {tower:c_external}
 
 */
-long helpfile_next(buffer,buflen,reclen)
-char *buffer;
-long buflen,*reclen;
-
+long helpfile_next(char *buffer, long buflen, long *reclen)
 {
     char buf[ENTRY_SIZE+1];
     long i;
@@ -263,9 +255,7 @@ long buflen,*reclen;
 }
 
 int
-keycmp(k1,k2)
-key_type *k1,*k2;
-
+keycmp(key_type *k1, key_type *k2)
 {
     return strcmp(k1->key,k2->key);
 }
@@ -273,8 +263,7 @@ key_type *k1,*k2;
 #ifdef TEST
 
 int
-main()
-
+main(int argc, char **argv)
 {
     char string[80],buffer[ENTRY_SIZE+1];
     long buflen;
